@@ -1,128 +1,95 @@
 #include "sort.h"
 #include <stdio.h>
-/**
- * print_bitonic - This prints the array modified by
- * bitonic algorithm in the function used below
- *
- * @arr: input array
- * @i: first index
- * @limit: last index
- * Return: no return
- */
-void print_bitonic(int *arr, int i, int limit)
-{
-	char *sep;
 
-	for (sep = ""; i < limit; i++)
-	{
-		printf("%s%d", sep, arr[i]);
-		sep = ", ";
-	}
-	printf("\n");
+void swap_ints(int *a, int *b);
+void bitonic_merge(int *array, size_t size, size_t start, size_t seq, char flow);
+void bitonic_seq(int *array, size_t size, size_t start, size_t seq, char flow);
+void bitonic_sort(int *array, size_t size);
+
+/**
+ * swap_ints - Swap two integers in an array.
+ * @a: First integer to swap.
+ * @b: Second integer to swap.
+ */
+
+void swap_ints(int *a, int *b)
+{
+	int temp;
+
+	temp = *a;
+	*a = *b;
+	*b = temp;
 }
 
+
 /**
- * sort_up - This will sorts the array in UP mode
- *
- * @arr: input array
- * @low: first index
- * @high: last index
- * Return: no return
+ * bitonic_merge - Sort a bitonic sequence inside an array of integers.
+ * @array: Array of integers.
+ * @size: Size of the array.
+ * @start: The starting index of the sequence in array to sort.
+ * @seq: Size of the sequence to sort.
+ * @flow: Direction to sort in.
  */
-void sort_up(int *arr, int low, int high)
+
+void bitonic_merge(int *array, size_t size, size_t start, size_t seq,
+		char flow)
 {
-	int i, j, max;
+	size_t i, jmp = seq / 2;
 
-	for (i = low; i < high; i++)
+	if (seq > 1)
 	{
-		max = i;
-
-		for (j = i + 1; j < high; j++)
+		for (i = start; i < start + jmp; i++)
 		{
-			if (arr[max] > arr[j])
-				max = j;
+			if ((flow == UP && array[i] > array[i + jmp]) ||
+			    (flow == DOWN && array[i] < array[i + jmp]))
+				swap_ints(array + i, array + i + jmp);
 		}
-
-		if (max != i)
-		{
-			arr[i] = arr[i] + arr[max];
-			arr[max] = arr[i] - arr[max];
-			arr[i] = arr[i] - arr[max];
-		}
+		bitonic_merge(array, size, start, jmp, flow);
+		bitonic_merge(array, size, start + jmp, jmp, flow);
 	}
 }
 
 /**
- * sort_down - This will sorts the array in DOWN mode
- *
- * @arr: input array
- * @low: first index
- * @high: last index
- * Return: no return
+ * bitonic_seq - Convert an array of integers into a bitonic sequence.
+ * @array: Array of integers.
+ * @size: Size of the array.
+ * @start: The starting index of a block of the building bitonic sequence.
+ * @seq: Size of a block of the building bitonic sequence.
+ * @flow: Direction to sort the bitonic sequence block in.
  */
-void sort_down(int *arr, int low, int high)
+
+
+void bitonic_seq(int *array, size_t size, size_t start, size_t seq, char flow)
 {
-	int i, j, max;
+	size_t cut = seq / 2;
+	char *str = (flow == UP) ? "UP" : "DOWN";
 
-	for (i = low; i < high; i++)
+	if (seq > 1)
 	{
-		max = i;
+		printf("Merging [%lu/%lu] (%s):\n", seq, size, str);
+		print_array(array + start, seq);
 
-		for (j = i + 1; j < high; j++)
-		{
-			if (arr[max] < arr[j])
-				max = j;
-		}
+		bitonic_seq(array, size, start, cut, UP);
+		bitonic_seq(array, size, start + cut, cut, DOWN);
+		bitonic_merge(array, size, start, seq, flow);
 
-		if (max != i)
-		{
-			arr[i] = arr[i] + arr[max];
-			arr[max] = arr[i] - arr[max];
-			arr[i] = arr[i] - arr[max];
-		}
+		printf("Result [%lu/%lu] (%s):\n", seq, size, str);
+		print_array(array + start, seq);
 	}
 }
 
 /**
- * recursion - The recursive function executes the bitonic sort
- * algorithm in the function below
- *
- * @arr: input array
- * @low: first index
- * @high: last index
- * @bool: UP or DOWN
- * @size: size of the array
- * Return: no return
+ * bitonic_sort - Sort an array of integers in ascending order.
+ * @array: Array of integers.
+ * @size: Size of the array.
+ * Description: Prints the array after each swap. Only works for size = 2^k where k >= 0 (ie. size equal to powers of 2).
  */
-void recursion(int *arr, int low, int high, int bool, size_t size)
-{
-	char *option;
 
-	if (high - low < 2)
+
+void bitonic_sort(int *array, size_t size)
+{
+	if (array == NULL || size < 2)
 		return;
 
-	option = (bool == 0) ? "UP" : "DOWN";
-	printf("Merging [%d/%ld] (%s):\n", high - low, size, option);
-	print_bitonic(arr, low, high);
-
-	if (high - low == 2)
-		return;
-
-	recursion(arr, low, (high + low) / 2, 0, size);
-	sort_up(arr, low, (high + low) / 2);
-	printf("Result [%d/%ld] (%s):\n", ((high + low) / 2) - low, size, "UP");
-	print_bitonic(arr, low, (high + low) / 2);
-
-	recursion(arr, (high + low) / 2, high, 1, size);
-	sort_down(arr, (high + low) / 2, high);
-	printf("Result [%d/%ld] (%s):\n", high - ((high + low) / 2), size, "DOWN");
-	print_bitonic(arr, (high + low) / 2, high);
+	bitonic_seq(array, size, 0, size, UP);
 }
-
-/**
- * bitonic_sort - This is the function that executes the bitonic_sort
- * algorithm
- *
- * @array: input array
- * @size: size of the array
- */
