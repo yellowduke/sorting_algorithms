@@ -1,7 +1,7 @@
 #include "sort.h"
 
 /**
- * swap - This swap position of two elements in the function used below 
+ * swap - This swap position of two elements in the function used below
  * @array: for printing
  * @size: for printing
  * @a: This is the element to swap with b
@@ -46,7 +46,7 @@ void heapify(int *array, size_t size, size_t i, size_t ac_size)
 }
 
 /**
- * heap_sort - This Sorts an array of integers in ascending order using Heap sort in the function used below
+ * heap_sort -  Sorts an array of integers in ascending order using Heap sort
  * @array: This the array to sort
  * @size: size of array
  */

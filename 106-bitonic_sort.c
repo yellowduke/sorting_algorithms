@@ -125,4 +125,4 @@ void recursion(int *arr, int low, int high, int bool, size_t size)
  *
  * @array: input array
  * @size: size of the array
-
+ */

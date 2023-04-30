@@ -1,7 +1,7 @@
 #include "sort.h"
 
 /**
- * quick_sort_hoare - This sorts an array using bitonic sort in the function used below to run the code
+ * quick_sort_hoare - Sorts array using bitonic sort
  * @array: array to sort
  * @size: size of array
  */
